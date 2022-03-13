@@ -1,8 +1,13 @@
-# Booting 
+# Booting
 
-The first step when the computer is switched on is that a program call BIOS (Basic Input Output System) runs basic hardware checks and then tries to load in memory the 512 bytes of the boot sector of a storage device like a floppy disk or a CD. This boot sector is simply found at the first memory sector.
+The first step when the computer is switched on is that a program call BIOS (Basic Input Output System) runs basic
+hardware checks and then tries to load in memory the 512 bytes of the boot sector of a storage device like a floppy disk
+or a CD. This boot sector is simply found at the first memory sector.
 
-We will first start with writing a raw binary boot sector in a file. An OS identifies a 512 byte memory block as a boot sector if it ends with `0xaaff`. Let's take a loo at the binary file:
+## Binary Boot Sector
+
+We will first start with writing a raw binary boot sector in a file. An OS identifies a 512 byte memory block as a boot
+sector if it ends with `0xaaff`. Let's take a look at the binary file:
 
 ```bash
 00000000: e9fd ff00 0000 0000 0000 0000 0000 0000  ................
@@ -39,10 +44,40 @@ We will first start with writing a raw binary boot sector in a file. An OS ident
 000001f0: 0000 0000 0000 0000 0000 0000 0000 55aa  ..............U.
 ```
 
-The last two bytes (in little-endian order) tell the BIOS that this is indeed the boot-sector. The first three bytes are x86 machine level instructions for an infinite loop. To test this good for nothing OS, we will use QEMU (Quick Emulator) which is a software based machine emulator. 
+The last two bytes (in little-endian order) tell the BIOS that this is indeed the boot-sector. The first three bytes are
+x86 machine level instructions for an infinite loop. To test this good for nothing OS, we will use QEMU (Quick Emulator)
+which is a software based machine emulator.
 
 ```bash
 qemu-system-x86_64 -drive format=raw,file=raw_bin_sector.bin
 ```
 
-You will see a QEMU window light up and stuck forever without any errors. This is expected since our OS does not do much other than looping forever.
+You will see a QEMU window light up and stuck forever without any errors. This is expected since our OS does not do much
+other than looping forever.
+
+However, we can see the writing bytes directly can be tedious. We will now instead use assemply language to write the
+boot sector.
+
+### Assembly Boot Sector
+
+The assembly boot sector is as follows:
+
+```assembly
+; Infinite loop
+loop:
+    jmp loop
+
+; Padding with 0s to make a 512 byte block
+times 510-($-$$) db 0
+
+; Boot sector identifier
+dw 0xaa55
+```
+
+Let's compile this assembly code to get a binary file:
+
+```bash
+nasm -f bin -o asm_bin_sector.bin asm_boot_sector.asm
+```
+
+You can now inspect the generated binary file and loading into QEMU will work as expected.
