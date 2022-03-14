@@ -3,7 +3,7 @@ mov ah, 0x0e
 
 ; Store the character to the printed on the screen in the register
 mov al, 'H'
-; Trigger instruction
+; Trigger interrupt
 int 0x10
 mov al, 'e'
 int 0x10
