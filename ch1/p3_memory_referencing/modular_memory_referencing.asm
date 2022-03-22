@@ -8,10 +8,13 @@ call print_string
 mov bx, GOODBYE_MSG
 call print_string
 
+mov dx, 0x1fb6
+call print_hex
+
 ; Loop indefinitely
 jmp $
 
-%include "print_string.asm"
+%include "print_hex.asm"
 
 HELLO_MSG:
     ; Null terminated string

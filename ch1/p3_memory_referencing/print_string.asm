@@ -14,7 +14,7 @@ print_string:
         ; Check if we reached the end of the string
         cmp byte [bx], 0
         ; If so, exit the loop
-        je finish
+        je finish_print_string
         ; Otherwise, print the next character
         mov al, [bx]
         int 0x10
@@ -23,7 +23,7 @@ print_string:
         ; Jump back to the start of the loop
         jmp print_char
 
-    finish:
+    finish_print_string:
         ; Restore register
         popa
         ; Return
